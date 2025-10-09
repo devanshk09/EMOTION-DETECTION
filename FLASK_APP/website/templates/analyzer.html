@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Emotion Analyzer</title>
+    <style>
+        :root {
+            --primary-color: #0fc296;
+            --primary-dark: #098c6e;
+            --bg-color: rgba(0, 0, 0, 0.7);
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: flex-end;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .top-btn {
+            padding: 10px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-decoration: none;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .top-btn:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .container {
+            background-color: var(--bg-color);
+            width: 90%;
+            max-width: 800px;
+            margin: 120px auto 50px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
+        }
+
+        h1, h2, h3, h4 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        form {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .result-box {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 150px;
+        }
+
+        .emotion-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+
+        .emoji {
+            font-size: 2.5rem;
+            margin-left: 15px;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .chart {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .chart img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .chart h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .score-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        .score-table th, .score-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .score-table th {
+            color: var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+                margin-top: 100px;
+            }
+
+            .chart {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+        <a href="{{ url_for('views.blank') }}" class="top-btn">Home</a>
+        <a href="{{ url_for('auth.logout') }}" class="top-btn">Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>🌍 Climate Emotion Analyzer</h1>
+
+        <form method="post" id="analysis-form">
+            <input type="text" name="user_input" placeholder="Enter a climate-related sentence (e.g., 'The wildfires are getting worse each year')" required>
+            <br>
+            <button type="submit">Analyze Text</button>
+        </form>
+
+        <div id="loading" style="display: none;">
+            <p>Analyzing your text... <span class="loading-emoji">🔍</span></p>
+        </div>
+
+        {% if user_input %}
+        <div class="result-box">
+            <h2>Analysis Results</h2>
+
+            <div class="result-item">
+                <span class="result-label">Input Text:</span>
+                <span>"{{ user_input }}"</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">Detected Disaster:</span>
+                <span>{{ disaster_type if disaster_type else 'None detected' }}</span>
+            </div>
+
+            <div class="emotion-display">
+                <span class="result-label">Dominant Emotion:</span>
+                <span>{{ predicted_emotion | capitalize }} <span class="emoji">{{ emoji }}</span></span>
+            </div>
+
+            {% if pie_chart or radar_chart or bar_chart %}
+            <h3>Emotion Scores</h3>
+            <table class="score-table">
+                <tr>
+                    <th>Emotion</th>
+                    <th>Score</th>
+                </tr>
+                {% for emotion, score in emotion_scores.items() %}
+                <tr>
+                    <td>{{ emotion | capitalize }}</td>
+                    <td>{{ "%.2f"|format(score) }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+
+            <div class="chart-container">
+                {% if pie_chart %}
+                <div class="chart">
+                    <h4>Emotion Distribution</h4>
+                    <img src="{{ url_for('static', filename=pie_chart) }}" alt="Pie chart showing emotion distribution">
+                </div>
+                {% endif %}
+
+                {% if radar_chart %}
+                <div class="chart">
+                    <h4>Emotion Radar</h4>
+                    <img src="{{ url_for('static', filename=radar_chart) }}" alt="Radar chart showing emotion scores">
+                </div>
+                {% endif %}
+
+                {% if bar_chart %}
+                <div class="chart">
+                    <h4>Emotion Scores</h4>
+                    <img src="{{ url_for('static', filename=bar_chart) }}" alt="Bar chart showing emotion scores">
+                </div>
+                {% endif %}
+            </div>
+
+            {% if predicted_emotion == 'error' %}
+            <div class="result-item" style="color: #ff6b6b; text-align: center;">
+                <p>We encountered an error analyzing this text. Please try again with different wording.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('analysis-form').addEventListener('submit', function () {
+            document.getElementById('loading').style.display = 'block';
+            this.querySelector('button').disabled = true;
+        });
+
+        document.querySelector('input[name="user_input"]').addEventListener('focus', function () {
+            document.getElementById('loading').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

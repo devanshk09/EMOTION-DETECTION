@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container text-center mt-5">
+  <h2 class="text-white mb-4">Welcome, {{ user.first_name }}!</h2>
+
+  <div class="row justify-content-center">
+    <!-- Predict Emotion -->
+    <div class="col-md-4">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+          <h5 class="card-title">Predict Emotion</h5>
+          <p class="card-text">Analyze a comment or message for emotional and disaster context.</p>
+          <a href="{{ url_for('views.emotion_analyzer') }}" class="btn btn-primary">Go to Analyzer</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Predicted Emotions -->
+    <div class="col-md-4">
+      <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+          <h5 class="card-title">Predicted Emotions</h5>
+          <p class="card-text">See a list of comments and their analyzed emotions.</p>
+          <a href="{{ url_for('views.predicted_results') }}" class="btn btn-secondary">View Predictions</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
